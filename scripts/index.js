@@ -1,21 +1,38 @@
-const guideList = document.querySelector('.guides');
+const guideList      = document.querySelector('.guides');
+const loggedOutLinks = document.querySelectorAll('.logged-out');
+const loggedInLinks  = document.querySelectorAll('.logged-in');
+
+const setupUI = (user)=>{
+  if(user){
+    //toggle UI elements 
+    loggedInLinks.forEach(link=> link.style.display="block");
+    loggedOutLinks.forEach(link=>link.style.display="none");
+  }
+  else{
+      //toggle UI elements 
+    loggedInLinks.forEach(link=> link.style.display="none");
+    loggedOutLinks.forEach(link=>link.style.display="block");
+  }
+}
 
 //setup guides 
 const setupGuides = (data)=>{
     let html = '';
-//     <li>
-//     <div class="collapsible-header grey lighten-4">Guide title</div>
-//     <div class="collapsible-body white"><span>Lorem ipsum dolor sit amet.</span></div>
-//   </li>
-     data.forEach(doc=>{
+    
+    if(data.length){
+      data.forEach(doc=>{
         const guide = doc.data();
-        console.log(guide);
         html+=`<li>
-           <div class="collapsible-header grey lighten-4">${guide.title}</div>
-             <div class="collapsible-body white"><span>${guide.content}</span></div>
-           </li>`
-     });
-     guideList.innerHTML=html;
+              <div class="collapsible-header grey lighten-4">${guide.title}</div>
+              <div class="collapsible-body white"><span>${guide.content}</span></div>
+            </li>`
+      });
+      guideList.innerHTML=html;
+    }
+    else{
+      guideList.innerHTML = "<h5>Login to view guides</h5>";
+    }
+   
 }
 
 //setup materialize components
