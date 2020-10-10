@@ -1,5 +1,3 @@
-//get data 
-
 
 //listen for auth status changes 
 auth.onAuthStateChanged(user=>{
@@ -9,13 +7,34 @@ auth.onAuthStateChanged(user=>{
    
    //if user login  then get guides collection from firebase firestore
    if(user){
-        db.collection('guides').get().then(snapshot=>{
+        db.collection('guides').onSnapshot(snapshot=>{
             setupGuides(snapshot.docs); //then set guides in document
+        },err=>{
+           console.log(err.message);
         });
    }
    else{
       setupGuides([]);
    }
+});
+
+
+//create new guide
+const createForm = document.querySelector('#create-form');
+createForm.addEventListener('submit',event=>{
+   event.preventDefault();
+   //add new guide to fireabase firestore
+   db.collection('guides').add({
+       title:createForm['title'].value,
+       content:createForm['content'].value
+   }).then(()=>{
+       //close the modal and reset form
+       const modal = document.querySelector('#modal-create');
+       M.Modal.getInstance(modal).close();
+       createForm.reset();
+   }).catch(error=>{
+       console.log(error);
+   });
 });
 
 //signup
@@ -28,7 +47,12 @@ signupForm.addEventListener('submit',function(event){
     const password = signupForm['signup-password'].value;
 
     //sign up the user 
-    auth.createUserWithEmailAndPassword(email,password).then(credentials=>{
+    auth.createUserWithEmailAndPassword(email,password).then(credential=>{
+        return db.collection('users').doc(credential.user.uid).set({
+            bio: signupForm['signup-bio'].value
+        });
+        
+    }).then(()=>{
         const modal = document.querySelector('#modal-signup');
         M.Modal.getInstance(modal).close();
         signupForm.reset();
